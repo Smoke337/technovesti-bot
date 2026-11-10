@@ -1,0 +1,34 @@
+name: Публикация поста
+
+on:
+  schedule:
+    # 9:14, 11:14, 13:14, 15:14, 17:14, 19:14, 21:14 по Саратову (UTC+4)
+    - cron: "14 5,7,9,11,13,15,17 * * *"
+  workflow_dispatch:  # ручной запуск из вкладки Actions
+
+permissions:
+  contents: write
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Опубликовать пост
+        env:
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+          CHAT_ID: ${{ secrets.CHAT_ID }}
+        run: python bot.py
+
+      - name: Сохранить историю публикаций
+        run: |
+          git config user.name "technovesti-bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add posted.json
+          git commit -m "posted: $(date -u +%Y-%m-%dT%H:%MZ)" || echo "Нет изменений"
+          git push
