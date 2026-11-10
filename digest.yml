@@ -32,3 +32,4 @@ jobs:
           git add posted.json
           git commit -m "posted: $(date -u +%Y-%m-%dT%H:%MZ)" || echo "Нет изменений"
           git push
+          .github/workflows/digest.yml
